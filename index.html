@@ -1,0 +1,1590 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Suivi Sanitaire</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue-deep:    #020B18;
+    --blue-dark:    #0A1628;
+    --blue-navy:    #0D2347;
+    --blue-mid:     #103B6D;
+    --blue-core:    #1565C0;
+    --blue-bright:  #1E88E5;
+    --blue-sky:     #42A5F5;
+    --blue-light:   #90CAF9;
+    --blue-pale:    #BBDEFB;
+    --blue-mist:    #E3F2FD;
+    --accent:       #00E5FF;
+    --accent2:      #29B6F6;
+    --gold:         #FFD54F;
+    --green:        #69F0AE;
+    --red:          #FF5252;
+    --white:        #F0F8FF;
+    --text-muted:   #90CAF9;
+    --card-bg:      rgba(13,35,71,0.75);
+    --card-border:  rgba(66,165,245,0.18);
+    --radius:       18px;
+    --radius-sm:    10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--blue-deep);
+    color: var(--white);
+    min-height: 100vh;
+    max-width: 430px;
+    margin: 0 auto;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* BG Effect */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -30%;
+    left: -20%;
+    width: 140%;
+    height: 80%;
+    background: radial-gradient(ellipse at 60% 40%, rgba(21,101,192,0.35) 0%, rgba(2,11,24,0) 70%),
+                radial-gradient(ellipse at 20% 80%, rgba(0,229,255,0.10) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===== SCREENS ===== */
+  .screen { display: none; min-height: 100vh; position: relative; z-index: 1; }
+  .screen.active { display: block; }
+
+  /* ===== SPLASH ===== */
+  #splash {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    gap: 18px;
+    animation: fadeIn 1s ease;
+  }
+  .splash-logo {
+    width: 90px; height: 90px;
+    background: linear-gradient(135deg, var(--blue-core), var(--accent));
+    border-radius: 26px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 42px;
+    box-shadow: 0 0 40px rgba(0,229,255,0.3);
+    animation: pulse 2.5s infinite;
+  }
+  .splash-title { font-size: 28px; font-weight: 800; letter-spacing: 1px; text-align: center; }
+  .splash-sub { color: var(--blue-light); font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
+  .splash-btn {
+    margin-top: 30px;
+    background: linear-gradient(135deg, var(--blue-core), var(--blue-bright));
+    color: #fff;
+    border: none;
+    padding: 16px 48px;
+    border-radius: 50px;
+    font-size: 17px;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 24px rgba(21,101,192,0.5);
+    transition: transform .2s, box-shadow .2s;
+  }
+  .splash-btn:active { transform: scale(0.96); }
+
+  /* ===== ONBOARDING ===== */
+  #onboarding {
+    padding: 40px 24px 120px;
+    animation: slideUp .5s ease;
+  }
+  .ob-header { text-align: center; margin-bottom: 32px; }
+  .ob-header h2 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
+  .ob-header p { color: var(--blue-light); font-size: 14px; }
+
+  .form-group { margin-bottom: 20px; }
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--blue-sky);
+    letter-spacing: .5px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .form-group input, .form-group select {
+    width: 100%;
+    background: var(--card-bg);
+    border: 1.5px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    color: var(--white);
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    padding: 14px 16px;
+    outline: none;
+    transition: border-color .2s;
+    backdrop-filter: blur(10px);
+  }
+  .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+  .form-group select option { background: var(--blue-navy); }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .ob-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--blue-core), var(--blue-bright));
+    color: #fff;
+    border: none;
+    padding: 18px;
+    border-radius: 50px;
+    font-size: 17px;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 24px rgba(21,101,192,0.5);
+    margin-top: 10px;
+    transition: transform .2s;
+  }
+  .ob-btn:active { transform: scale(0.97); }
+
+  /* ===== MAIN APP ===== */
+  #app { padding-bottom: 90px; }
+
+  .topbar {
+    background: linear-gradient(180deg, rgba(2,11,24,0.98) 0%, rgba(10,22,40,0.9) 100%);
+    backdrop-filter: blur(20px);
+    padding: 20px 22px 14px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--card-border);
+  }
+  .topbar-row { display: flex; align-items: center; justify-content: space-between; }
+  .topbar-logo { display: flex; align-items: center; gap: 10px; }
+  .topbar-icon { font-size: 26px; }
+  .topbar-name { font-size: 19px; font-weight: 800; }
+  .topbar-name span { color: var(--accent); }
+  .greeting { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+  .topbar-avatar {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, var(--blue-mid), var(--blue-bright));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 2px solid var(--accent);
+  }
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    background: rgba(10,22,40,0.97);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--card-border);
+    display: flex;
+    z-index: 200;
+    padding: 6px 0 8px;
+  }
+  .nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-family: 'Outfit', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 0;
+    transition: color .2s;
+    letter-spacing: .3px;
+  }
+  .nav-btn .nav-icon { font-size: 22px; transition: transform .2s; }
+  .nav-btn.active { color: var(--accent); }
+  .nav-btn.active .nav-icon { transform: scale(1.15); }
+
+  /* ===== TABS ===== */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--card-bg);
+    border: 1.5px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 18px;
+    backdrop-filter: blur(12px);
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--blue-bright), transparent);
+  }
+
+  /* ===== HOME TAB ===== */
+  .home-pad { padding: 20px 18px; }
+
+  .sleep-card {
+    background: linear-gradient(135deg, rgba(13,35,71,0.9), rgba(16,59,109,0.7));
+    border: 1.5px solid rgba(0,229,255,0.2);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    backdrop-filter: blur(12px);
+  }
+  .sleep-icon { font-size: 40px; }
+  .sleep-info h3 { font-size: 14px; color: var(--blue-light); font-weight: 500; margin-bottom: 4px; }
+  .sleep-time { font-size: 26px; font-weight: 800; font-family: 'Space Mono', monospace; color: var(--accent); }
+  .sleep-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .stat-card {
+    background: var(--card-bg);
+    border: 1.5px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+  }
+  .stat-icon { font-size: 28px; margin-bottom: 6px; }
+  .stat-val { font-size: 22px; font-weight: 800; color: var(--white); font-family: 'Space Mono', monospace; }
+  .stat-label { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-top: 3px; letter-spacing: .3px; }
+
+  .steps-card {
+    background: linear-gradient(135deg, rgba(21,101,192,0.3), rgba(30,136,229,0.15));
+    border: 1.5px solid rgba(66,165,245,0.3);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .steps-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .steps-header h3 { font-size: 15px; font-weight: 700; }
+  .steps-badge {
+    background: rgba(0,229,255,0.15);
+    color: var(--accent);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .steps-val { font-size: 38px; font-weight: 800; font-family: 'Space Mono', monospace; color: var(--white); }
+  .steps-goal { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+  .progress-bar { background: rgba(255,255,255,0.1); border-radius: 10px; height: 8px; overflow: hidden; }
+  .progress-fill {
+    height: 100%;
+    border-radius: 10px;
+    background: linear-gradient(90deg, var(--blue-core), var(--accent));
+    transition: width 1s ease;
+  }
+
+  .steps-input-row { display: flex; gap: 10px; margin-top: 14px; }
+  .steps-input {
+    flex: 1;
+    background: rgba(255,255,255,0.07);
+    border: 1.5px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    color: var(--white);
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    padding: 10px 14px;
+    outline: none;
+  }
+  .steps-input:focus { border-color: var(--accent); }
+  .steps-btn {
+    background: linear-gradient(135deg, var(--blue-core), var(--blue-bright));
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 10px 18px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .section-title {
+    font-size: 17px;
+    font-weight: 800;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title span { color: var(--accent); }
+
+  /* ===== ROUTINE TAB ===== */
+  .routine-pad { padding: 20px 18px; }
+
+  .routine-header-card {
+    background: linear-gradient(135deg, var(--blue-mid), var(--blue-core));
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .routine-header-card .rh-icon { font-size: 40px; }
+  .routine-header-card h2 { font-size: 18px; font-weight: 800; }
+  .routine-header-card p { font-size: 13px; color: var(--blue-pale); margin-top: 4px; }
+
+  .routine-item {
+    background: var(--card-bg);
+    border: 1.5px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: border-color .2s;
+    backdrop-filter: blur(10px);
+  }
+  .routine-item.done { border-color: rgba(105,240,174,0.4); background: rgba(105,240,174,0.05); }
+  .routine-check {
+    width: 30px; height: 30px; min-width: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--blue-bright);
+    background: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s;
+    font-size: 15px;
+  }
+  .routine-check.checked {
+    background: var(--green);
+    border-color: var(--green);
+    color: var(--blue-deep);
+  }
+  .routine-info { flex: 1; }
+  .routine-name { font-size: 15px; font-weight: 700; }
+  .routine-meta { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+  .routine-icon { font-size: 22px; }
+
+  .progress-circle-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    margin-bottom: 20px;
+  }
+  .progress-circle {
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    background: conic-gradient(var(--accent) 0%, rgba(255,255,255,0.08) 0%);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    transition: background 1s;
+  }
+  .progress-circle-inner {
+    width: 85px; height: 85px;
+    background: var(--blue-dark);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+  }
+  .pc-val { font-size: 22px; font-weight: 800; font-family: 'Space Mono', monospace; }
+  .pc-sub { font-size: 10px; color: var(--text-muted); }
+  .pc-label { margin-top: 10px; font-size: 13px; color: var(--text-muted); }
+
+  .add-routine-btn {
+    width: 100%;
+    background: rgba(21,101,192,0.2);
+    border: 1.5px dashed rgba(66,165,245,0.4);
+    border-radius: var(--radius);
+    color: var(--blue-sky);
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 16px;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background .2s;
+  }
+  .add-routine-btn:active { background: rgba(21,101,192,0.35); }
+
+  /* ===== REPAS TAB ===== */
+  .repas-pad { padding: 20px 18px; }
+
+  .kcal-card {
+    background: linear-gradient(135deg, rgba(13,35,71,0.95), rgba(21,101,192,0.4));
+    border: 1.5px solid rgba(0,229,255,0.25);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .kcal-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .kcal-title { font-size: 16px; font-weight: 800; }
+  .kcal-edit {
+    background: rgba(255,255,255,0.1);
+    border: 1.5px solid var(--card-border);
+    border-radius: 8px;
+    color: var(--white);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    padding: 6px 12px;
+    outline: none;
+    width: 90px;
+    text-align: center;
+  }
+  .kcal-numbers { display: flex; gap: 0; margin-bottom: 12px; }
+  .kcal-num { flex: 1; text-align: center; }
+  .kcal-big { font-size: 28px; font-weight: 800; font-family: 'Space Mono', monospace; color: var(--accent); }
+  .kcal-lbl { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .kcal-sep { width: 1px; background: var(--card-border); margin: 4px 0; }
+
+  .meal-section-title {
+    font-size: 16px; font-weight: 800;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .meal-section-title .badge {
+    background: rgba(21,101,192,0.3);
+    color: var(--blue-sky);
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .food-list { margin-bottom: 20px; }
+  .food-item {
+    background: var(--card-bg);
+    border: 1.5px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    backdrop-filter: blur(10px);
+    transition: border-color .2s, transform .15s;
+  }
+  .food-item:active { transform: scale(0.98); }
+  .food-emoji { font-size: 30px; }
+  .food-info { flex: 1; }
+  .food-name { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+  .food-desc { font-size: 12px; color: var(--text-muted); }
+  .food-kcal {
+    background: rgba(0,229,255,0.12);
+    color: var(--accent);
+    padding: 4px 10px;
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'Space Mono', monospace;
+  }
+  .food-item.selected { border-color: rgba(105,240,174,0.5); background: rgba(105,240,174,0.05); }
+  .food-check { font-size: 18px; }
+
+  /* ===== BADGES TAB ===== */
+  .badges-pad { padding: 20px 18px; }
+
+  .badges-hero {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .badges-hero h2 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+  .badges-hero p { font-size: 14px; color: var(--text-muted); }
+
+  .badges-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .badge-card {
+    background: var(--card-bg);
+    border: 1.5px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 18px 12px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s;
+  }
+  .badge-card.unlocked {
+    border-color: rgba(255,213,79,0.4);
+    background: rgba(255,213,79,0.05);
+  }
+  .badge-card.unlocked::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .badge-card.locked { opacity: 0.45; }
+  .badge-emoji { font-size: 38px; margin-bottom: 8px; }
+  .badge-name { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+  .badge-desc { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+  .badge-locked-icon {
+    position: absolute;
+    top: 10px; right: 10px;
+    font-size: 14px;
+    opacity: 0.5;
+  }
+
+  /* ===== CONSEILS TAB ===== */
+  .conseils-pad { padding: 20px 18px; }
+
+  .conseil-card {
+    background: var(--card-bg);
+    border: 1.5px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 14px;
+    display: flex;
+    gap: 14px;
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+  }
+  .conseil-card::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--blue-bright), var(--accent));
+    border-radius: 0 3px 3px 0;
+  }
+  .conseil-icon { font-size: 28px; }
+  .conseil-body { flex: 1; }
+  .conseil-cat {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--blue-sky);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .conseil-text { font-size: 14px; line-height: 1.6; color: var(--blue-pale); }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(2,11,24,0.85);
+    z-index: 500;
+    backdrop-filter: blur(4px);
+    align-items: flex-end;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--blue-navy);
+    border: 1.5px solid var(--card-border);
+    border-radius: 24px 24px 0 0;
+    padding: 28px 24px 40px;
+    width: 100%;
+    animation: slideUp .3s ease;
+  }
+  .modal-handle {
+    width: 40px; height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    margin: 0 auto 20px;
+  }
+  .modal-title { font-size: 18px; font-weight: 800; margin-bottom: 20px; }
+  .modal-input {
+    width: 100%;
+    background: rgba(255,255,255,0.07);
+    border: 1.5px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    color: var(--white);
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    padding: 13px 16px;
+    outline: none;
+    margin-bottom: 12px;
+  }
+  .modal-input:focus { border-color: var(--accent); }
+  .modal-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--blue-core), var(--blue-bright));
+    color: #fff;
+    border: none;
+    padding: 16px;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+  .modal-cancel {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    cursor: pointer;
+    padding: 12px;
+    margin-top: 4px;
+  }
+
+  /* ===== SLEEP INDICATOR ===== */
+  .sleep-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .sleep-dot.tracking { background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: blink 1.2s infinite; }
+  .sleep-dot.done { background: var(--green); }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 30px rgba(0,229,255,0.25); } 50% { box-shadow: 0 0 50px rgba(0,229,255,0.55); } }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* ===== PROFILE MODAL ===== */
+  .profile-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(2,11,24,0.92);
+    z-index: 500;
+    backdrop-filter: blur(6px);
+    align-items: flex-start;
+    justify-content: center;
+    padding: 20px;
+    overflow-y: auto;
+  }
+  .profile-overlay.open { display: flex; }
+  .profile-box {
+    background: var(--blue-navy);
+    border: 1.5px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 28px 22px;
+    width: 100%;
+    max-width: 400px;
+    animation: fadeIn .3s ease;
+    margin-top: 20px;
+  }
+  .profile-avatar-big {
+    width: 70px; height: 70px;
+    background: linear-gradient(135deg, var(--blue-core), var(--blue-bright));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+    font-weight: 800;
+    margin: 0 auto 16px;
+    border: 3px solid var(--accent);
+  }
+  .profile-fullname { text-align: center; font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+  .profile-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 18px 0; }
+  .ps-item { text-align: center; background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px 6px; }
+  .ps-val { font-size: 18px; font-weight: 800; font-family: 'Space Mono', monospace; color: var(--accent); }
+  .ps-label { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+  .profile-close {
+    width: 100%;
+    background: rgba(255,255,255,0.07);
+    border: 1.5px solid var(--card-border);
+    color: var(--white);
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 14px;
+    border-radius: 50px;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+  .profile-edit-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--blue-core), var(--blue-bright));
+    border: none;
+    color: white;
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px;
+    border-radius: 50px;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+
+  .imc-card {
+    background: rgba(21,101,192,0.2);
+    border: 1.5px solid rgba(66,165,245,0.3);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin: 14px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .imc-label { font-size: 13px; color: var(--blue-light); }
+  .imc-val { font-size: 20px; font-weight: 800; font-family: 'Space Mono', monospace; }
+  .imc-status { font-size: 12px; color: var(--green); font-weight: 600; margin-top: 2px; }
+
+  .divider { height: 1px; background: var(--card-border); margin: 14px 0; }
+</style>
+</head>
+<body>
+
+<!-- ===== SPLASH ===== -->
+<div id="splash" class="screen active">
+  <div class="splash-logo"><img src="https://cdn-icons-png.flaticon.com/512/2933/2933246.png" width="50" height="50" alt="heart"></div>
+  <div>
+    <div class="splash-title">Suivi<br>Sanitaire</div>
+  </div>
+  <div class="splash-sub">Votre santé, votre rythme</div>
+  <button class="splash-btn" onclick="startApp()">Commencer →</button>
+</div>
+
+<!-- ===== ONBOARDING ===== -->
+<div id="onboarding" class="screen">
+  <div class="ob-header">
+    <div style="font-size:48px;margin-bottom:12px;"><img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" width="48" height="48" alt="profile"></div>
+    <h2>Mon Profil</h2>
+    <p>Ces informations personnalisent votre suivi</p>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>Prénom</label>
+      <input type="text" id="ob-prenom" placeholder="Ex : Marie">
+    </div>
+    <div class="form-group">
+      <label>Nom</label>
+      <input type="text" id="ob-nom" placeholder="Ex : Dupont">
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>Âge</label>
+      <input type="number" id="ob-age" placeholder="Ex : 25" min="5" max="120">
+    </div>
+    <div class="form-group">
+      <label>Taille (cm)</label>
+      <input type="number" id="ob-taille" placeholder="Ex : 170" min="100" max="250">
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>Poids (kg)</label>
+      <input type="number" id="ob-poids" placeholder="Ex : 65" min="20" max="300">
+    </div>
+    <div class="form-group">
+      <label>Sexe</label>
+      <select id="ob-sexe">
+        <option value="homme">Homme</option>
+        <option value="femme">Femme</option>
+        <option value="autre">Autre</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Objectif Pas / jour</label>
+    <input type="number" id="ob-steps" placeholder="Ex : 8000" value="8000">
+  </div>
+
+  <div class="form-group">
+    <label>Niveau d'activité</label>
+    <select id="ob-activite">
+      <option value="sedentaire">Sédentaire</option>
+      <option value="leger">Légèrement actif</option>
+      <option value="modere" selected>Modérément actif</option>
+      <option value="actif">Très actif</option>
+    </select>
+  </div>
+
+  <button class="ob-btn" onclick="saveProfile()">💙 Créer mon profil</button>
+</div>
+
+<!-- ===== MAIN APP ===== -->
+<div id="app" class="screen">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-row">
+      <div class="topbar-logo">
+        <span class="topbar-icon"><img src="https://cdn-icons-png.flaticon.com/512/2933/2933246.png" width="26" height="26" alt="heart"></span>
+        <div>
+          <div class="topbar-name">Suivi <span>Sanitaire</span></div>
+          <div class="greeting" id="greeting-text">Bonjour !</div>
+        </div>
+      </div>
+      <div class="topbar-avatar" id="avatar-btn" onclick="openProfile()">?</div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div id="tab-home" class="tab-content active">
+    <div class="home-pad">
+
+      <!-- SLEEP -->
+      <div class="sleep-card" id="sleep-card">
+        <div class="sleep-icon"><img src="https://cdn-icons-png.flaticon.com/512/2715/2715276.png" width="40" height="40" alt="sleep"></div>
+        <div class="sleep-info">
+          <h3><span class="sleep-dot" id="sleep-dot"></span><span id="sleep-status-text">Surveillance du sommeil</span></h3>
+          <div class="sleep-time" id="sleep-display">--:--</div>
+          <div class="sleep-sub" id="sleep-sub-text">Posez votre téléphone pour démarrer</div>
+        </div>
+      </div>
+
+      <!-- STEPS -->
+      <div class="steps-card">
+        <div class="steps-header">
+          <h3><img src="https://cdn-icons-png.flaticon.com/512/3014/3014874.png" width="20" height="20" alt="steps"> Pas aujourd'hui</h3>
+          <div class="steps-badge" id="steps-badge">0%</div>
+        </div>
+        <div class="steps-val" id="steps-val">0</div>
+        <div class="steps-goal" id="steps-goal-text">sur 8 000 objectif</div>
+        <div class="progress-bar"><div class="progress-fill" id="steps-bar" style="width:0%"></div></div>
+        <div class="steps-input-row">
+          <input class="steps-input" type="number" id="steps-input" placeholder="Ajouter des pas...">
+          <button class="steps-btn" onclick="addSteps()">+ Ajouter</button>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="section-title"><img src="https://cdn-icons-png.flaticon.com/512/2425/2425523.png" width="20" height="20" alt="stats"> <span>Statistiques</span> du jour</div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon"><img src="https://cdn-icons-png.flaticon.com/512/4980/4980242.png" width="28" height="28" alt="kcal"></div>
+          <div class="stat-val" id="kcal-burned">0</div>
+          <div class="stat-label">kcal brûlées</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><img src="https://cdn-icons-png.flaticon.com/512/2715/2715276.png" width="28" height="28" alt="sleep"></div>
+          <div class="stat-val" id="sleep-hours-stat">--</div>
+          <div class="stat-label">heures de sommeil</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><img src="https://cdn-icons-png.flaticon.com/512/2964/2964517.png" width="28" height="28" alt="sport"></div>
+          <div class="stat-val" id="routine-done-stat">0/0</div>
+          <div class="stat-label">sports faits</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><img src="https://cdn-icons-png.flaticon.com/512/2583/2583290.png" width="28" height="28" alt="badge"></div>
+          <div class="stat-val" id="badges-count-stat">0</div>
+          <div class="stat-label">badges gagnés</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ROUTINE TAB -->
+  <div id="tab-routine" class="tab-content">
+    <div class="routine-pad">
+      <div class="routine-header-card">
+        <div class="rh-icon"><img src="https://cdn-icons-png.flaticon.com/512/2964/2964517.png" width="40" height="40" alt="sport"></div>
+        <div>
+          <h2>Ma Routine Sportive</h2>
+          <p>Activités quotidiennes recommandées</p>
+        </div>
+      </div>
+
+      <div class="progress-circle-wrap">
+        <div class="progress-circle" id="routine-circle">
+          <div class="progress-circle-inner">
+            <div class="pc-val" id="routine-pct">0%</div>
+            <div class="pc-sub">complété</div>
+          </div>
+        </div>
+        <div class="pc-label" id="routine-label-text">0 exercice(s) terminé(s)</div>
+      </div>
+
+      <div id="routine-list"></div>
+
+      <button class="add-routine-btn" onclick="openAddRoutine()">＋ Ajouter un exercice</button>
+    </div>
+  </div>
+
+  <!-- REPAS TAB -->
+  <div id="tab-repas" class="tab-content">
+    <div class="repas-pad">
+
+      <div class="kcal-card">
+        <div class="kcal-row">
+          <div class="kcal-title"><img src="https://cdn-icons-png.flaticon.com/512/4980/4980242.png" width="20" height="20" alt="fire"> Calories du jour</div>
+          <input class="kcal-edit" type="number" id="kcal-input" placeholder="kcal" value="0" onchange="updateKcal()">
+        </div>
+        <div class="kcal-numbers">
+          <div class="kcal-num">
+            <div class="kcal-big" id="kcal-dep">0</div>
+            <div class="kcal-lbl">Dépensées</div>
+          </div>
+          <div class="kcal-sep"></div>
+          <div class="kcal-num">
+            <div class="kcal-big" id="kcal-rec">0</div>
+            <div class="kcal-lbl">À consommer</div>
+          </div>
+          <div class="kcal-sep"></div>
+          <div class="kcal-num">
+            <div class="kcal-big" id="kcal-base">2000</div>
+            <div class="kcal-lbl">Besoin de base</div>
+          </div>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="kcal-bar" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div id="meal-sections"></div>
+
+    </div>
+  </div>
+
+  <!-- BADGES TAB -->
+  <div id="tab-badges" class="tab-content">
+    <div class="badges-pad">
+      <div class="badges-hero">
+        <div style="font-size:52px;margin-bottom:10px;"><img src="https://cdn-icons-png.flaticon.com/512/2583/2583290.png" width="52" height="52" alt="trophy"></div>
+        <h2>Mes Badges</h2>
+        <p>Accomplissez vos objectifs pour débloquer des récompenses</p>
+      </div>
+      <div class="badges-grid" id="badges-grid"></div>
+    </div>
+  </div>
+
+  <!-- CONSEILS TAB -->
+  <div id="tab-conseils" class="tab-content">
+    <div class="conseils-pad">
+      <div class="section-title" style="margin-bottom:20px;"><img src="https://cdn-icons-png.flaticon.com/512/2425/2425523.png" width="20" height="20" alt="idea"> <span>Conseils</span> Santé</div>
+      <div id="conseils-list"></div>
+    </div>
+  </div>
+
+</div><!-- end #app -->
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav" id="bottom-nav">
+  <button class="nav-btn active" data-tab="home" onclick="switchTab('home',this)">
+    <span class="nav-icon"><img src="https://cdn-icons-png.flaticon.com/512/1946/1946488.png" width="22" height="22" alt="home"></span>Accueil
+  </button>
+  <button class="nav-btn" data-tab="routine" onclick="switchTab('routine',this)">
+    <span class="nav-icon"><img src="https://cdn-icons-png.flaticon.com/512/2964/2964517.png" width="22" height="22" alt="routine"></span>Routine
+  </button>
+  <button class="nav-btn" data-tab="repas" onclick="switchTab('repas',this)">
+    <span class="nav-icon"><img src="https://cdn-icons-png.flaticon.com/512/3082/3082194.png" width="22" height="22" alt="repas"></span>Repas
+  </button>
+  <button class="nav-btn" data-tab="badges" onclick="switchTab('badges',this)">
+    <span class="nav-icon"><img src="https://cdn-icons-png.flaticon.com/512/2583/2583290.png" width="22" height="22" alt="badges"></span>Badges
+  </button>
+  <button class="nav-btn" data-tab="conseils" onclick="switchTab('conseils',this)">
+    <span class="nav-icon"><img src="https://cdn-icons-png.flaticon.com/512/2425/2425523.png" width="22" height="22" alt="conseils"></span>Conseils
+  </button>
+</div>
+
+<!-- ADD ROUTINE MODAL -->
+<div class="modal-overlay" id="routine-modal">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title">➕ Ajouter un exercice</div>
+    <input class="modal-input" type="text" id="r-name" placeholder="Nom (ex : Pompes)">
+    <input class="modal-input" type="text" id="r-meta" placeholder="Durée ou séries (ex : 3 x 15 rép)">
+    <input class="modal-input" type="text" id="r-icon" placeholder="Emoji (ex : 🏋️)">
+    <button class="modal-btn" onclick="addRoutine()">Ajouter l'exercice</button>
+    <button class="modal-cancel" onclick="closeModal('routine-modal')">Annuler</button>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="profile-overlay" id="profile-modal">
+  <div class="profile-box">
+    <div class="profile-avatar-big" id="pm-avatar">?</div>
+    <div class="profile-fullname" id="pm-fullname">—</div>
+    <div style="text-align:center;color:var(--text-muted);font-size:13px;" id="pm-age-info">—</div>
+
+    <div class="profile-stats">
+      <div class="ps-item">
+        <div class="ps-val" id="pm-taille">—</div>
+        <div class="ps-label">Taille (cm)</div>
+      </div>
+      <div class="ps-item">
+        <div class="ps-val" id="pm-poids">—</div>
+        <div class="ps-label">Poids (kg)</div>
+      </div>
+      <div class="ps-item">
+        <div class="ps-val" id="pm-steps">—</div>
+        <div class="ps-label">Obj. Pas</div>
+      </div>
+    </div>
+
+    <div class="imc-card">
+      <div>
+        <div class="imc-label">Indice de Masse Corporelle</div>
+        <div class="imc-status" id="pm-imc-status">—</div>
+      </div>
+      <div class="imc-val" id="pm-imc">—</div>
+    </div>
+
+    <div class="divider"></div>
+    <button class="profile-edit-btn" onclick="editProfile()">✏️ Modifier mon profil</button>
+    <button class="profile-close" onclick="closeModal('profile-modal')">Fermer</button>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+let profile = null;
+let sleepStartTime = null;
+let sleepEndTime = null;
+let sleepTracking = false;
+let inactivityTimer = null;
+const INACTIVITY_DELAY = 5 * 60 * 1000; // 5 minutes
+
+let appData = {
+  steps: 0,
+  kcalBurned: 0,
+  kcalInput: 0,
+  routine: [],
+  selectedFoods: [],
+  badges: {},
+  sleepStart: null,
+  sleepEnd: null,
+  lastDate: null
+};
+
+// ===== FOOD DB =====
+const foods = {
+  matin: [
+    { emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082227.png" width="28" height="28">', name:'Porridge', desc:'Avoine + lait végétal + banane', kcal:320 },
+    { emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082183.png" width="28" height="28">', name:'Œufs brouillés', desc:'3 œufs + pain complet', kcal:280 },
+    { emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082194.png" width="28" height="28">', name:'Bowl açaï', desc:'Açaï, fruits rouges, granola', kcal:350 },
+    { emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082200.png" width="28" height="28">', name:'Pancakes complets', desc:'Farine complète, miel, banane', kcal:400 },
+    { emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082217.png" width="28" height="28">', name:'Smoothie protéiné', desc:'Banane, lait, whey, cacao', kcal:310 },
+  ],
+  midi: [
+    { emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082186.png" width="28" height="28">', name:'Poulet grillé + riz', desc:'Protéines, glucides complexes', kcal:520 },
+    { emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082194.png" width="28" height="28">', name:'Salade composée', desc:'Légumes, thon, quinoa, huile d\'olive', kcal:380 },
+    { emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082182.png" width="28" height="28">', name:'Saumon au four', desc:'Saumon, patate douce, haricots verts', kcal:490 },
+    { emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082192.png" width="28" height="28">', name:'Bowl légumineuses', desc:'Lentilles, pois chiches, légumes', kcal:420 },
+    { emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082184.png" width="28" height="28">', name:'Steak + légumes', desc:'Bœuf maigre, brocoli, carotte', kcal:550 },
+  ],
+  soir: [
+    { emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082191.png" width="28" height="28">', name:'Soupe de légumes', desc:'Légèrement sucré, facile à digérer', kcal:180 },
+    { emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082189.png" width="28" height="28">', name:'Légumes vapeur + poisson', desc:'Colin, brocoli, courgette', kcal:290 },
+    { emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082183.png" width="28" height="28">', name:'Omelette aux légumes', desc:'3 œufs, épinards, champignons', kcal:260 },
+    { emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082192.png" width="28" height="28">', name:'Dahl de lentilles', desc:'Épices douces, lentilles corail', kcal:310 },
+    { emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082194.png" width="28" height="28">', name:'Wrap complet', desc:'Tortilla complète, avocat, poulet', kcal:380 },
+  ],
+  snack: [
+    { emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082222.png" width="28" height="28">', name:'Banane', desc:'Énergie rapide avant sport', kcal:90 },
+    { emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082219.png" width="28" height="28">', name:'Amandes', desc:'30g – graisses saines, protéines', kcal:170 },
+    { emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082220.png" width="28" height="28">', name:'Pomme + beurre cacahuète', desc:'Fibres + protéines', kcal:200 },
+    { emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082217.png" width="28" height="28">', name:'Smoothie vert', desc:'Épinards, concombre, citron, gingembre', kcal:110 },
+    { emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082215.png" width="28" height="28">', name:'Carré chocolat noir', desc:'2 carrés 85% cacao – antioxydants', kcal:80 },
+  ]
+};
+
+// ===== BADGES DEF =====
+const badgesDef = [
+  { id:'first_step', emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3014/3014874.png" width="32" height="32">', name:'Premier Pas', desc:'Enregistrer vos premiers pas', condition: d => d.steps >= 1 },
+  { id:'steps_5k', emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3014/3014874.png" width="32" height="32">', name:'Marcheur', desc:'5 000 pas en une journée', condition: d => d.steps >= 5000 },
+  { id:'steps_10k', emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3014/3014874.png" width="32" height="32">', name:'Coureur', desc:'10 000 pas en une journée', condition: d => d.steps >= 10000 },
+  { id:'first_sleep', emoji:'<img src="https://cdn-icons-png.flaticon.com/512/2715/2715276.png" width="32" height="32">', name:'Bonne Nuit', desc:'Premier suivi du sommeil', condition: d => d.sleepStart !== null },
+  { id:'routine_50', emoji:'<img src="https://cdn-icons-png.flaticon.com/512/2964/2964517.png" width="32" height="32">', name:'Discipliné', desc:'50% de la routine complétée', condition: d => getRoutinePct() >= 50 },
+  { id:'routine_100', emoji:'<img src="https://cdn-icons-png.flaticon.com/512/2964/2964517.png" width="32" height="32">', name:'Champion', desc:'100% de la routine complétée', condition: d => getRoutinePct() >= 100 },
+  { id:'first_meal', emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082194.png" width="32" height="32">', name:'Bien Nourri', desc:'Choisir un aliment recommandé', condition: d => d.selectedFoods && d.selectedFoods.length > 0 },
+  { id:'profile_done', emoji:'<img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" width="32" height="32">', name:'Mon Profil', desc:'Profil complété', condition: d => profile !== null },
+];
+
+// ===== CONSEILS =====
+const conseils = [
+  { icon:'<img src="https://cdn-icons-png.flaticon.com/512/2425/2425523.png" width="24" height="24">', cat:'Hydratation', text:'Buvez au moins 1,5 à 2 litres d\'eau par jour. Hydratez-vous avant d\'avoir soif, particulièrement durant l\'effort physique.' },
+  { icon:'<img src="https://cdn-icons-png.flaticon.com/512/2715/2715276.png" width="24" height="24">', cat:'Sommeil', text:'Visez 7 à 9 heures de sommeil par nuit. Un sommeil régulier améliore la récupération musculaire, la mémoire et l\'humeur.' },
+  { icon:'<img src="https://cdn-icons-png.flaticon.com/512/2964/2964517.png" width="24" height="24">', cat:'Activité', text:'L\'OMS recommande 150 à 300 minutes d\'activité modérée par semaine. Même une marche de 30 min par jour est bénéfique !' },
+  { icon:'<img src="https://cdn-icons-png.flaticon.com/512/3082/3082194.png" width="24" height="24">', cat:'Nutrition', text:'Remplissez la moitié de votre assiette de légumes, un quart de protéines maigres et un quart de glucides complexes.' },
+  { icon:'<img src="https://cdn-icons-png.flaticon.com/512/2425/2425523.png" width="24" height="24">', cat:'Numérique', text:'Évitez les écrans au moins 1 heure avant de dormir. La lumière bleue perturbe la production de mélatonine.' },
+  { icon:'<img src="https://cdn-icons-png.flaticon.com/512/2964/2964517.png" width="24" height="24">', cat:'Stress', text:'5 minutes de respiration profonde par jour réduisent significativement le cortisol (hormone du stress).' },
+  { icon:'<img src="https://cdn-icons-png.flaticon.com/512/2425/2425523.png" width="24" height="24">', cat:'Hygiène', text:'Brossez-vous les dents 2 fois par jour pendant 2 minutes et utilisez le fil dentaire chaque soir.' },
+  { icon:'<img src="https://cdn-icons-png.flaticon.com/512/2933/2933246.png" width="24" height="24">', cat:'Vitamine D', text:'Exposez-vous 15 à 20 min au soleil chaque jour pour maintenir un bon taux de vitamine D, essentiel pour les os et l\'immunité.' },
+  { icon:'<img src="https://cdn-icons-png.flaticon.com/512/2964/2964517.png" width="24" height="24">', cat:'Cardio', text:'Le cardio à intensité modérée brûle des graisses efficacement. Maintenez une fréquence cardiaque à 60-70% de votre max.' },
+  { icon:'<img src="https://cdn-icons-png.flaticon.com/512/2964/2964517.png" width="24" height="24">', cat:'Musculation', text:'La musculation 2 à 3 fois par semaine augmente le métabolisme de base, vous permettant de brûler plus de calories au repos.' },
+];
+
+// ===== INIT =====
+function init() {
+  const saved = localStorage.getItem('ss_profile');
+  if (saved) {
+    profile = JSON.parse(saved);
+  }
+  const savedData = localStorage.getItem('ss_data');
+  if (savedData) {
+    const parsed = JSON.parse(savedData);
+    const today = new Date().toDateString();
+    if (parsed.lastDate !== today) {
+      appData.routine = parsed.routine || getDefaultRoutine();
+      appData.routine.forEach(r => r.done = false);
+      appData.steps = 0;
+      appData.kcalBurned = 0;
+      appData.kcalInput = 0;
+      appData.selectedFoods = [];
+      appData.sleepStart = null;
+      appData.sleepEnd = null;
+      appData.badges = parsed.badges || {};
+      appData.lastDate = today;
+    } else {
+      appData = { ...appData, ...parsed };
+    }
+  } else {
+    appData.routine = getDefaultRoutine();
+    appData.lastDate = new Date().toDateString();
+  }
+}
+
+function getDefaultRoutine() {
+  return [
+    { id:1, name:'Pompes', meta:'3 × 15 répétitions', icon:'🏋️', done:false },
+    { id:2, name:'Squat', meta:'3 × 20 répétitions', icon:'🦵', done:false },
+    { id:3, name:'Gainage', meta:'3 × 45 secondes', icon:'💪', done:false },
+    { id:4, name:'Course / Marche', meta:'30 minutes', icon:'🏃', done:false },
+    { id:5, name:'Étirements', meta:'10 minutes', icon:'🧘', done:false },
+  ];
+}
+
+function saveData() {
+  localStorage.setItem('ss_data', JSON.stringify(appData));
+}
+
+// ===== SCREENS =====
+function startApp() {
+  const saved = localStorage.getItem('ss_profile');
+  if (saved) {
+    profile = JSON.parse(saved);
+    showApp();
+  } else {
+    showScreen('onboarding');
+  }
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('bottom-nav').style.display = id === 'app' ? 'flex' : 'none';
+}
+
+function showApp() {
+  init();
+  showScreen('app');
+  renderAll();
+  setupSleepTracking();
+  updateGreeting();
+  setupInactivity();
+}
+
+// ===== PROFILE =====
+function saveProfile() {
+  const prenom = document.getElementById('ob-prenom').value.trim();
+  const nom = document.getElementById('ob-nom').value.trim();
+  const age = parseInt(document.getElementById('ob-age').value);
+  const taille = parseInt(document.getElementById('ob-taille').value);
+  const poids = parseFloat(document.getElementById('ob-poids').value);
+  const sexe = document.getElementById('ob-sexe').value;
+  const stepsGoal = parseInt(document.getElementById('ob-steps').value) || 8000;
+  const activite = document.getElementById('ob-activite').value;
+
+  if (!prenom || !nom || !age || !taille || !poids) {
+    alert('Veuillez remplir tous les champs obligatoires.');
+    return;
+  }
+
+  profile = { prenom, nom, age, taille, poids, sexe, stepsGoal, activite };
+  localStorage.setItem('ss_profile', JSON.stringify(profile));
+  showApp();
+}
+
+function editProfile() {
+  closeModal('profile-modal');
+  profile = null;
+  localStorage.removeItem('ss_profile');
+  showScreen('onboarding');
+}
+
+// ===== GREETING =====
+function updateGreeting() {
+  const h = new Date().getHours();
+  let msg = h < 12 ? 'Bonjour' : h < 18 ? 'Bon après-midi' : 'Bonsoir';
+  if (profile) {
+    document.getElementById('greeting-text').textContent = `${msg}, ${profile.prenom} ! 👋`;
+    const initials = (profile.prenom[0] + profile.nom[0]).toUpperCase();
+    document.getElementById('avatar-btn').textContent = initials;
+  } else {
+    document.getElementById('greeting-text').textContent = `${msg} ! 👋`;
+  }
+}
+
+// ===== RENDER ALL =====
+function renderAll() {
+  renderSteps();
+  renderRoutine();
+  renderRepas();
+  renderBadges();
+  renderConseils();
+  checkBadges();
+}
+
+// ===== STEPS =====
+function addSteps() {
+  const val = parseInt(document.getElementById('steps-input').value);
+  if (!val || val <= 0) return;
+  appData.steps += val;
+  document.getElementById('steps-input').value = '';
+  renderSteps();
+  updateKcalBurned();
+  checkBadges();
+  saveData();
+}
+
+function renderSteps() {
+  const goal = profile ? profile.stepsGoal : 8000;
+  const pct = Math.min(100, Math.round((appData.steps / goal) * 100));
+  document.getElementById('steps-val').textContent = appData.steps.toLocaleString('fr-FR');
+  document.getElementById('steps-goal-text').textContent = `sur ${goal.toLocaleString('fr-FR')} objectif`;
+  document.getElementById('steps-badge').textContent = pct + '%';
+  document.getElementById('steps-bar').style.width = pct + '%';
+}
+
+// ===== KCAL =====
+function updateKcalBurned() {
+  const w = profile ? profile.poids : 70;
+  const stepsKcal = Math.round(appData.steps * 0.04 * (w / 70));
+  const routineKcal = appData.routine.filter(r => r.done).length * 80;
+  appData.kcalBurned = stepsKcal + routineKcal;
+  document.getElementById('kcal-burned').textContent = appData.kcalBurned;
+  renderRepas();
+  saveData();
+}
+
+function updateKcal() {
+  appData.kcalInput = parseInt(document.getElementById('kcal-input').value) || 0;
+  renderRepas();
+  saveData();
+}
+
+function getBaseKcal() {
+  if (!profile) return 2000;
+  const { poids, taille, age, sexe, activite } = profile;
+  let bmr;
+  if (sexe === 'homme') bmr = 10*poids + 6.25*taille - 5*age + 5;
+  else bmr = 10*poids + 6.25*taille - 5*age - 161;
+  const factors = { sedentaire:1.2, leger:1.375, modere:1.55, actif:1.725 };
+  return Math.round(bmr * (factors[activite] || 1.55));
+}
+
+// ===== ROUTINE =====
+function renderRoutine() {
+  const list = document.getElementById('routine-list');
+  list.innerHTML = '';
+  appData.routine.forEach((r, i) => {
+    const div = document.createElement('div');
+    div.className = 'routine-item' + (r.done ? ' done' : '');
+    div.innerHTML = `
+      <button class="routine-check ${r.done ? 'checked' : ''}" onclick="toggleRoutine(${i})">
+        ${r.done ? '✓' : ''}
+      </button>
+      <div class="routine-info">
+        <div class="routine-name" style="${r.done ? 'text-decoration:line-through;opacity:0.6' : ''}">${r.name}</div>
+        <div class="routine-meta">${r.meta}</div>
+      </div>
+      <div class="routine-icon">${r.icon}</div>
+    `;
+    list.appendChild(div);
+  });
+  updateRoutineCircle();
+  document.getElementById('routine-done-stat').textContent = `${appData.routine.filter(r=>r.done).length}/${appData.routine.length}`;
+}
+
+function toggleRoutine(i) {
+  appData.routine[i].done = !appData.routine[i].done;
+  renderRoutine();
+  updateKcalBurned();
+  checkBadges();
+  saveData();
+}
+
+function getRoutinePct() {
+  if (!appData.routine.length) return 0;
+  return Math.round((appData.routine.filter(r=>r.done).length / appData.routine.length) * 100);
+}
+
+function updateRoutineCircle() {
+  const pct = getRoutinePct();
+  document.getElementById('routine-pct').textContent = pct + '%';
+  const done = appData.routine.filter(r=>r.done).length;
+  document.getElementById('routine-label-text').textContent = `${done} exercice(s) terminé(s)`;
+  const circle = document.getElementById('routine-circle');
+  circle.style.background = `conic-gradient(var(--accent) ${pct*3.6}deg, rgba(255,255,255,0.08) ${pct*3.6}deg)`;
+}
+
+function openAddRoutine() {
+  document.getElementById('routine-modal').classList.add('open');
+}
+
+function addRoutine() {
+  const name = document.getElementById('r-name').value.trim();
+  const meta = document.getElementById('r-meta').value.trim();
+  const icon = document.getElementById('r-icon').value.trim() || '🏋️';
+  if (!name) return;
+  appData.routine.push({ id: Date.now(), name, meta: meta || 'À définir', icon, done: false });
+  document.getElementById('r-name').value = '';
+  document.getElementById('r-meta').value = '';
+  document.getElementById('r-icon').value = '';
+  closeModal('routine-modal');
+  renderRoutine();
+  saveData();
+}
+
+// ===== REPAS =====
+function renderRepas() {
+  const base = getBaseKcal();
+  const dep = appData.kcalBurned;
+  const rec = Math.max(0, base + dep - (appData.kcalInput || 0));
+  document.getElementById('kcal-dep').textContent = dep;
+  document.getElementById('kcal-rec').textContent = rec;
+  document.getElementById('kcal-base').textContent = base;
+  document.getElementById('kcal-input').value = appData.kcalInput || '';
+  const pct = Math.min(100, Math.round(((appData.kcalInput || 0) / (base + dep)) * 100));
+  document.getElementById('kcal-bar').style.width = pct + '%';
+
+  const sections = document.getElementById('meal-sections');
+  const labels = { matin:'🌅 Petit-déjeuner', midi:'☀️ Déjeuner', soir:'🌙 Dîner', snack:'🍎 Collation' };
+  sections.innerHTML = '';
+
+  Object.keys(foods).forEach(key => {
+    const div = document.createElement('div');
+    const recommended = foods[key].slice(0, 3);
+    div.innerHTML = `
+      <div class="meal-section-title">${labels[key]} <span class="badge">${recommended.length} suggérés</span></div>
+      <div class="food-list">${recommended.map(f => renderFoodItem(f, key)).join('')}</div>
+    `;
+    sections.appendChild(div);
+  });
+}
+
+function renderFoodItem(f, meal) {
+  const key = `${meal}_${f.name}`;
+  const selected = appData.selectedFoods && appData.selectedFoods.includes(key);
+  return `<div class="food-item ${selected ? 'selected' : ''}" onclick="toggleFood('${key}', ${f.kcal})">
+    <div class="food-emoji">${f.emoji}</div>
+    <div class="food-info">
+      <div class="food-name">${f.name}</div>
+      <div class="food-desc">${f.desc}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+      <div class="food-kcal">${f.kcal} kcal</div>
+      <div class="food-check">${selected ? '✅' : '⬜'}</div>
+    </div>
+  </div>`;
+}
+
+function toggleFood(key, kcal) {
+  if (!appData.selectedFoods) appData.selectedFoods = [];
+  const idx = appData.selectedFoods.indexOf(key);
+  if (idx === -1) {
+    appData.selectedFoods.push(key);
+    appData.kcalInput = (appData.kcalInput || 0) + kcal;
+  } else {
+    appData.selectedFoods.splice(idx, 1);
+    appData.kcalInput = Math.max(0, (appData.kcalInput || 0) - kcal);
+  }
+  checkBadges();
+  saveData();
+  renderRepas();
+}
+
+// ===== BADGES =====
+function checkBadges() {
+  let changed = false;
+  badgesDef.forEach(b => {
+    if (!appData.badges[b.id] && b.condition(appData)) {
+      appData.badges[b.id] = true;
+      changed = true;
+    }
+  });
+  if (changed) {
+    saveData();
+    renderBadges();
+  }
+  document.getElementById('badges-count-stat').textContent = Object.keys(appData.badges).filter(k => appData.badges[k]).length;
+}
+
+function renderBadges() {
+  const grid = document.getElementById('badges-grid');
+  grid.innerHTML = '';
+  if (profile) appData.badges['profile_done'] = true;
+  badgesDef.forEach(b => {
+    const unlocked = !!appData.badges[b.id];
+    const div = document.createElement('div');
+    div.className = 'badge-card ' + (unlocked ? 'unlocked' : 'locked');
+    div.innerHTML = `
+      ${!unlocked ? '<div class="badge-locked-icon">🔒</div>' : ''}
+      <div class="badge-emoji">${b.emoji}</div>
+      <div class="badge-name">${b.name}</div>
+      <div class="badge-desc">${b.desc}</div>
+    `;
+    grid.appendChild(div);
+  });
+  document.getElementById('badges-count-stat').textContent = Object.keys(appData.badges).filter(k => appData.badges[k]).length;
+}
+
+// ===== CONSEILS =====
+function renderConseils() {
+  const list = document.getElementById('conseils-list');
+  list.innerHTML = conseils.map(c => `
+    <div class="conseil-card">
+      <div class="conseil-icon">${c.icon}</div>
+      <div class="conseil-body">
+        <div class="conseil-cat">${c.cat}</div>
+        <div class="conseil-text">${c.text}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== SLEEP TRACKING =====
+function setupSleepTracking() {
+  if (appData.sleepStart) {
+    sleepStartTime = new Date(appData.sleepStart);
+    if (appData.sleepEnd) {
+      sleepEndTime = new Date(appData.sleepEnd);
+      showSleepResult();
+    } else {
+      sleepTracking = true;
+      updateSleepUI(true);
+    }
+  }
+}
+
+function setupInactivity() {
+  const resetTimer = () => {
+    if (inactivityTimer) clearTimeout(inactivityTimer);
+    if (sleepTracking) {
+      stopSleep();
+    }
+    inactivityTimer = setTimeout(() => {
+      if (!sleepTracking && !appData.sleepEnd) {
+        startSleep();
+      }
+    }, INACTIVITY_DELAY);
+  };
+
+  ['touchstart','touchmove','click','keydown','scroll'].forEach(evt => {
+    document.addEventListener(evt, resetTimer, { passive: true });
+  });
+  inactivityTimer = setTimeout(() => {
+    if (!sleepTracking && !appData.sleepEnd) startSleep();
+  }, INACTIVITY_DELAY);
+}
+
+function startSleep() {
+  sleepTracking = true;
+  sleepStartTime = new Date();
+  appData.sleepStart = sleepStartTime.toISOString();
+  appData.sleepEnd = null;
+  saveData();
+  updateSleepUI(true);
+}
+
+function stopSleep() {
+  if (!sleepTracking) return;
+  sleepTracking = false;
+  sleepEndTime = new Date();
+  appData.sleepEnd = sleepEndTime.toISOString();
+  saveData();
+  showSleepResult();
+}
+
+function updateSleepUI(tracking) {
+  const dot = document.getElementById('sleep-dot');
+  const txt = document.getElementById('sleep-status-text');
+  const disp = document.getElementById('sleep-display');
+  const sub = document.getElementById('sleep-sub-text');
+  if (tracking) {
+    dot.className = 'sleep-dot tracking';
+    txt.textContent = 'Suivi du sommeil actif';
+    disp.textContent = formatTime(sleepStartTime);
+    sub.textContent = 'Heure d\'endormissement enregistrée';
+  }
+}
+
+function showSleepResult() {
+  const dot = document.getElementById('sleep-dot');
+  const txt = document.getElementById('sleep-status-text');
+  const disp = document.getElementById('sleep-display');
+  const sub = document.getElementById('sleep-sub-text');
+  dot.className = 'sleep-dot done';
+  txt.textContent = 'Sommeil enregistré';
+  disp.textContent = formatTime(sleepStartTime);
+  const dur = getDurationHours(sleepStartTime, sleepEndTime);
+  sub.textContent = `Réveil : ${formatTime(sleepEndTime)} — ${dur}h de sommeil`;
+  document.getElementById('sleep-hours-stat').textContent = dur;
+}
+
+function formatTime(date) {
+  if (!date) return '--:--';
+  return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+}
+
+function getDurationHours(start, end) {
+  if (!start || !end) return '--';
+  const ms = end - start;
+  return (ms / 3600000).toFixed(1);
+}
+
+// ===== PROFILE MODAL =====
+function openProfile() {
+  if (!profile) return;
+  const { prenom, nom, age, taille, poids, stepsGoal } = profile;
+  const initials = (prenom[0] + nom[0]).toUpperCase();
+  document.getElementById('pm-avatar').textContent = initials;
+  document.getElementById('pm-fullname').textContent = `${prenom} ${nom}`;
+  document.getElementById('pm-age-info').textContent = `${age} ans · ${profile.sexe}`;
+  document.getElementById('pm-taille').textContent = taille;
+  document.getElementById('pm-poids').textContent = poids;
+  document.getElementById('pm-steps').textContent = stepsGoal.toLocaleString('fr-FR');
+
+  const imc = (poids / ((taille/100)**2)).toFixed(1);
+  document.getElementById('pm-imc').textContent = imc;
+  let status = imc < 18.5 ? 'Sous-poids' : imc < 25 ? 'Poids normal ✓' : imc < 30 ? 'Surpoids' : 'Obésité';
+  document.getElementById('pm-imc-status').textContent = status;
+  document.getElementById('pm-imc-status').style.color = imc >= 18.5 && imc < 25 ? 'var(--green)' : 'var(--gold)';
+
+  document.getElementById('profile-modal').classList.add('open');
+}
+
+// ===== TABS =====
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  btn.classList.add('active');
+  if (tab === 'repas') updateKcal();
+}
+
+// ===== MODALS =====
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// ===== BOOT =====
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('bottom-nav').style.display = 'none';
+});
+</script>
+</body>
+</html>
+```
